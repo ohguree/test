@@ -1,0 +1,1141 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>STEM 이지스마트 파머 아카이브</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Jua&family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#FBFAF3;
+    --paper-line:#E4E9D8;
+    --stem:#4A7856;
+    --stem-dark:#355A3F;
+    --leaf-light:#8FB596;
+    --soil:#8B6F47;
+    --coral:#E8927C;
+    --sun:#E8B84B;
+    --ink:#2E2A22;
+    --ink-soft:#6B6555;
+    --card:#FFFFFF;
+    --shadow: 0 2px 10px rgba(74,120,86,0.12);
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    font-family:'Noto Sans KR', sans-serif;
+    font-size:16px;
+    line-height:1.65;
+    background:
+      linear-gradient(var(--paper-line) 1px, transparent 1px) 0 0/100% 28px,
+      var(--paper);
+    color:var(--ink);
+    min-height:100vh;
+    padding-bottom:60px;
+  }
+  h1,h2,h3, .label-font{ font-family:'Jua', 'Noto Sans KR', sans-serif; font-weight:400; }
+  .hidden{ display:none !important; }
+  button{ font-family:'Noto Sans KR', sans-serif; font-weight:600; cursor:pointer; border:none; }
+  input, textarea{ font-family:'Noto Sans KR', sans-serif; }
+
+  /* Header */
+  header.top{
+    background:var(--stem);
+    color:#fff;
+    padding:22px 20px 26px;
+    position:relative;
+    overflow:hidden;
+  }
+  header.top::after{
+    content:"";
+    position:absolute; left:0; right:0; bottom:-1px; height:14px;
+    background:
+      radial-gradient(circle at 10px 0, transparent 9px, var(--stem) 10px) 0 -5px/20px 14px repeat-x;
+  }
+  header.top h1{
+    font-size:28px; font-weight:700; display:flex; align-items:center; gap:8px;
+  }
+  header.top p{ opacity:.9; font-size:14px; margin-top:4px; }
+
+  .wrap{ max-width:760px; margin:0 auto; padding:24px 16px; }
+
+  /* Buttons */
+  .btn{
+    background:var(--stem); color:#fff; border-radius:10px;
+    padding:12px 18px; font-size:16px; font-weight:600;
+    display:inline-flex; align-items:center; gap:6px;
+    box-shadow:var(--shadow);
+    transition:transform .15s ease, background .15s ease;
+  }
+  .btn:hover{ background:var(--stem-dark); transform:translateY(-1px); }
+  .btn.secondary{ background:#fff; color:var(--stem); border:2px solid var(--stem); box-shadow:none; }
+  .btn.secondary:hover{ background:#F0F5EC; }
+  .btn.danger{ background:#fff; color:#C9614C; border:2px solid #E8927C; box-shadow:none; }
+  .btn.danger:hover{ background:#FBEDE9; }
+  .btn.block{ width:100%; justify-content:center; }
+  .btn.small{ padding:7px 14px; font-size:14px; border-radius:8px; }
+
+  /* Project grid */
+  .project-grid{
+    display:grid; grid-template-columns:repeat(auto-fill, minmax(220px,1fr));
+    gap:16px; margin-top:18px;
+  }
+  .project-card{
+    background:var(--card); border-radius:16px; padding:18px;
+    box-shadow:var(--shadow); cursor:pointer;
+    border-top:6px solid var(--leaf-light);
+    transition:transform .15s ease, box-shadow .15s ease;
+    display:flex; flex-direction:column; gap:8px; min-height:150px;
+  }
+  .project-card:hover{ transform:translateY(-3px); box-shadow:0 8px 18px rgba(74,120,86,0.18); }
+  .project-card .num{
+    font-family:'Noto Sans KR', sans-serif; font-weight:600; font-size:13px; color:var(--stem);
+    background:#EAF2E4; width:fit-content; padding:2px 10px; border-radius:20px;
+  }
+  .project-card h3{ font-size:20px; color:var(--ink); }
+  .project-card .hypo{ font-size:14px; color:var(--ink-soft); line-height:1.6; flex:1;
+    display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+  .project-card .meta{ font-size:13px; color:var(--ink-soft); display:flex; justify-content:space-between; align-items:center; }
+  .project-card .thumb{ width:100%; height:90px; object-fit:cover; border-radius:10px; margin-top:-4px; }
+
+  .empty-state{
+    text-align:center; padding:50px 20px; color:var(--ink-soft);
+  }
+  .empty-state .emoji{ font-size:44px; margin-bottom:10px; }
+  .empty-state h3{ font-size:20px; color:var(--ink); margin-bottom:6px; }
+
+  /* Detail view */
+  .back-btn{
+    display:inline-flex; align-items:center; gap:4px; color:var(--stem);
+    font-weight:600; font-size:15px; margin-bottom:14px; background:none;
+  }
+  .hypo-card{
+    background:var(--card); border-radius:16px; padding:20px; box-shadow:var(--shadow);
+    margin-bottom:24px;
+  }
+  .hypo-card h2{ font-size:24px; margin-bottom:10px; color:var(--stem-dark); }
+  .hypo-card .hypo-text{
+    background:#F4F8F0; border-left:4px solid var(--stem); padding:10px 14px;
+    border-radius:8px; font-size:16px; line-height:1.65; margin-bottom:14px;
+  }
+  .var-grid{ display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; }
+  .var-box{ background:#FCFBF6; border:1px solid var(--paper-line); border-radius:10px; padding:10px 12px; }
+  .var-box .tag{ font-family:'Noto Sans KR','sans-serif'; font-weight:700; font-size:14px; margin-bottom:4px; display:block; }
+  .var-box.indep .tag{ color:var(--coral); }
+  .var-box.ctrl .tag{ color:var(--sun); }
+  .var-box.dep .tag{ color:var(--stem); }
+  .var-box .val{ font-size:14px; color:var(--ink); line-height:1.5; }
+  .hypo-actions{ margin-top:14px; display:flex; gap:8px; justify-content:flex-end; }
+
+  .section-title{ display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; }
+  .section-title h3{ font-size:20px; color:var(--ink); }
+
+  /* Tabs */
+  .tabs{ display:flex; gap:8px; margin-bottom:18px; border-bottom:2px solid var(--paper-line); }
+  .tab-btn{
+    background:none; padding:10px 4px; font-size:16px; font-weight:600; color:var(--ink-soft);
+    border-bottom:3px solid transparent; margin-bottom:-2px; display:flex; align-items:center; gap:6px;
+  }
+  .tab-btn.active{ color:var(--stem-dark); border-bottom-color:var(--stem); }
+
+  /* Sensor tab */
+  .sensor-fields-row{ display:flex; flex-wrap:wrap; align-items:center; gap:8px; margin-bottom:14px; }
+  .field-chip{
+    background:#EAF2E4; color:var(--stem-dark); font-size:14px; font-weight:600;
+    padding:6px 10px 6px 14px; border-radius:20px; display:inline-flex; align-items:center; gap:6px;
+  }
+  .field-chip button{
+    background:none; color:var(--stem-dark); opacity:.6; font-size:14px; line-height:1; padding:2px;
+  }
+  .field-chip button:hover{ opacity:1; }
+  .add-field-row{ display:flex; gap:6px; }
+  .add-field-row input{
+    border:2px solid var(--paper-line); border-radius:20px; padding:6px 12px; font-size:14px; width:140px;
+  }
+  .add-field-row input:focus{ outline:none; border-color:var(--stem); }
+  .sensor-actions{ display:flex; gap:10px; margin-bottom:20px; flex-wrap:wrap; }
+
+  .chart-card{
+    background:var(--card); border-radius:14px; padding:16px; box-shadow:var(--shadow); margin-bottom:16px;
+  }
+  .chart-card h4{ font-family:'Noto Sans KR',sans-serif; font-weight:700; font-size:15px; margin-bottom:10px; color:var(--stem-dark); }
+  .chart-card canvas{ max-height:240px; }
+  .corr-badge{
+    display:inline-block; font-size:13px; font-weight:700; padding:3px 10px; border-radius:12px; margin-top:8px;
+  }
+  .corr-badge.strong{ background:#E8927C22; color:#B5573E; }
+  .corr-badge.mid{ background:#E8B84B22; color:#9C7A1E; }
+  .corr-badge.weak{ background:#EAF2E4; color:var(--ink-soft); }
+
+  .chart-card select{
+    border:2px solid var(--paper-line); border-radius:8px; padding:7px 10px; font-size:14px;
+    background:#fff; color:var(--ink); font-family:'Noto Sans KR',sans-serif;
+  }
+  .chart-card select:focus{ outline:none; border-color:var(--stem); }
+  .custom-chart-controls{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:12px; }
+  .custom-chart-controls span{ font-size:13px; color:var(--ink-soft); }
+  .sensor-table{ width:100%; border-collapse:collapse; font-size:14px; background:var(--card); border-radius:14px; overflow:hidden; box-shadow:var(--shadow); }
+  .sensor-table th, .sensor-table td{ padding:9px 10px; text-align:left; border-bottom:1px solid var(--paper-line); }
+  .sensor-table th{ background:#F4F8F0; color:var(--stem-dark); font-size:13px; }
+  .sensor-table td.num{ text-align:right; font-variant-numeric:tabular-nums; }
+  .sensor-table .del-cell{ text-align:center; }
+  .sensor-table .del-cell button{ background:none; color:var(--coral); font-size:16px; }
+
+  /* Growth timeline (signature element) */
+  .timeline{ position:relative; padding-left:28px; }
+  .timeline::before{
+    content:""; position:absolute; left:9px; top:4px; bottom:4px; width:4px;
+    background:linear-gradient(var(--stem), var(--leaf-light));
+    border-radius:4px;
+  }
+  .record{ position:relative; margin-bottom:22px; }
+  .record::before{
+    content:"🌿"; position:absolute; left:-30px; top:2px; font-size:20px;
+    filter:drop-shadow(0 1px 1px rgba(0,0,0,0.15));
+  }
+  .record-card{
+    background:var(--card); border-radius:14px; padding:14px 16px; box-shadow:var(--shadow);
+  }
+  .record-card .rec-head{ display:flex; justify-content:space-between; align-items:baseline; margin-bottom:6px; flex-wrap:wrap; gap:4px; }
+  .record-card .rec-who{ font-weight:700; font-size:15px; color:var(--stem-dark); }
+  .record-card .rec-date{ font-size:13px; color:var(--ink-soft); }
+  .record-card .rec-content{ font-size:15px; line-height:1.65; color:var(--ink); white-space:pre-wrap; }
+  .record-card .rec-note{ font-size:14px; line-height:1.6; color:var(--ink-soft); white-space:pre-wrap; background:#F7F6EE; border-radius:8px; padding:8px 10px; margin-top:10px; }
+  .record-card .rec-note .rec-note-label{ font-family:'Noto Sans KR',sans-serif; font-weight:700; color:var(--soil); margin-right:4px; }
+  .record-card img{ width:100%; max-height:260px; object-fit:cover; border-radius:10px; margin-top:10px; }
+  .record-card .rec-actions{ margin-top:8px; display:flex; justify-content:flex-end; gap:8px; }
+
+  /* Modal */
+  .overlay{
+    position:fixed; inset:0; background:rgba(46,42,34,0.45); display:flex;
+    align-items:flex-end; justify-content:center; z-index:50; padding:0;
+  }
+  .modal{
+    background:var(--paper); width:100%; max-width:520px; border-radius:20px 20px 0 0;
+    padding:24px 20px 28px; max-height:88vh; overflow-y:auto;
+    box-shadow:0 -6px 30px rgba(0,0,0,0.2);
+  }
+  @media(min-width:600px){
+    .overlay{ align-items:center; }
+    .modal{ border-radius:20px; }
+  }
+  .modal h2{ font-size:22px; margin-bottom:16px; color:var(--stem-dark); }
+  .field{ margin-bottom:14px; }
+  .field label{ display:block; font-family:'Noto Sans KR',sans-serif; font-weight:600; font-size:15px; margin-bottom:5px; color:var(--ink); }
+  .field input[type=text], .field input[type=date], .field textarea{
+    width:100%; border:2px solid var(--paper-line); border-radius:10px; padding:10px 12px;
+    font-size:15px; background:#fff; color:var(--ink);
+  }
+  .field input:focus, .field textarea:focus{ outline:none; border-color:var(--stem); }
+  .field textarea{ resize:vertical; min-height:70px; }
+  .field-row{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .field .hint{ font-size:13px; color:var(--ink-soft); margin-top:4px; }
+  .modal-actions{ display:flex; gap:10px; margin-top:18px; }
+  .photo-input-wrap{ display:flex; align-items:center; gap:10px; }
+  .photo-preview{ width:64px; height:64px; border-radius:10px; object-fit:cover; border:2px solid var(--paper-line); display:none; }
+
+  .toast{
+    position:fixed; bottom:20px; left:50%; transform:translateX(-50%);
+    background:var(--ink); color:#fff; padding:10px 18px; border-radius:20px;
+    font-size:14px; z-index:100; opacity:0; transition:opacity .3s ease;
+    pointer-events:none;
+  }
+  .toast.show{ opacity:1; }
+
+  .config-warning{
+    background:#FFF6E5; border:2px dashed var(--sun); border-radius:12px;
+    padding:16px; margin:16px; font-size:14px; line-height:1.6; color:var(--ink);
+  }
+  .config-warning code{ background:#00000010; padding:1px 5px; border-radius:4px; }
+
+  ::-webkit-scrollbar{ width:8px; }
+  ::-webkit-scrollbar-thumb{ background:var(--leaf-light); border-radius:8px; }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <h1>🌱 우리 반 식물 실험 아카이브</h1>
+  <p>가설을 세우고, 변인을 바꾸고, 자라나는 모습을 기록해요</p>
+</header>
+
+<div id="configWarning" class="config-warning hidden">
+  ⚠️ Firebase 설정이 아직 안 되어 있어요. index.html 맨 아래 <code>firebaseConfig</code> 부분을 본인의 Realtime Database 프로젝트 값으로 바꿔주세요. (README.md 참고)
+</div>
+
+<div class="wrap">
+
+  <!-- 홈: 프로젝트 목록 -->
+  <div id="view-home">
+    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+      <h2 style="font-size:22px;">프로젝트 목록</h2>
+      <button class="btn" onclick="openProjectModal()">+ 새 프로젝트</button>
+    </div>
+    <div id="projectGrid" class="project-grid"></div>
+    <div id="emptyProjects" class="empty-state hidden">
+      <div class="emoji">🌱</div>
+      <h3>아직 프로젝트가 없어요</h3>
+      <p>첫 실험을 시작해 볼까요? "+ 새 프로젝트" 버튼을 눌러보세요.</p>
+    </div>
+  </div>
+
+  <!-- 상세: 프로젝트 -->
+  <div id="view-detail" class="hidden">
+    <button class="back-btn" onclick="goHome()">← 목록으로</button>
+    <div class="hypo-card">
+      <h2 id="detailTitle"></h2>
+      <div class="hypo-text" id="detailHypo"></div>
+      <div class="var-grid">
+        <div class="var-box indep"><span class="tag">🔧 조작변인</span><div class="val" id="detailIndep"></div></div>
+        <div class="var-box ctrl"><span class="tag">🔒 통제변인</span><div class="val" id="detailCtrl"></div></div>
+        <div class="var-box dep"><span class="tag">📏 종속변인</span><div class="val" id="detailDep"></div></div>
+      </div>
+      <div class="hypo-actions">
+        <button class="btn danger small" onclick="deleteProject()">프로젝트 삭제</button>
+      </div>
+    </div>
+
+    <div class="tabs">
+      <button class="tab-btn active" id="tabBtnRecords" onclick="switchTab('records')">🌿 관찰 기록</button>
+      <button class="tab-btn" id="tabBtnSensor" onclick="switchTab('sensor')">📊 센서 데이터</button>
+    </div>
+
+    <div id="tab-records">
+      <div class="section-title">
+        <h3>관찰 기록</h3>
+        <button class="btn small" onclick="openRecordModal()">+ 기록 추가</button>
+      </div>
+      <div id="timeline" class="timeline"></div>
+      <div id="emptyRecords" class="empty-state hidden">
+        <div class="emoji">📔</div>
+        <h3>아직 기록이 없어요</h3>
+        <p>오늘 관찰한 내용을 첫 기록으로 남겨보세요.</p>
+      </div>
+    </div>
+
+    <div id="tab-sensor" class="hidden">
+      <div class="sensor-fields-row">
+        <div id="sensorFieldChips"></div>
+        <div class="add-field-row">
+          <input type="text" id="newFieldName" placeholder="센서 이름 (예: 조도)">
+          <button class="btn small" onclick="addSensorField()">+ 추가</button>
+        </div>
+      </div>
+      <div class="sensor-actions">
+        <button class="btn small" onclick="openSensorModal()">+ 데이터 입력</button>
+        <button class="btn small secondary" onclick="document.getElementById('csvInput').click()">📄 CSV 업로드</button>
+        <input type="file" id="csvInput" accept=".csv" class="hidden" onchange="handleCsvUpload(event)">
+      </div>
+
+      <div id="sensorEmpty" class="empty-state hidden">
+        <div class="emoji">📊</div>
+        <h3>아직 센서 데이터가 없어요</h3>
+        <p>센서 이름을 추가하고 데이터를 입력하거나 CSV로 불러와 보세요.</p>
+      </div>
+
+      <div id="customChartCard" class="chart-card hidden">
+        <h4>🔧 나만의 그래프 만들기</h4>
+        <div class="custom-chart-controls">
+          <span>X축</span>
+          <select id="customXAxis"></select>
+          <span>Y축</span>
+          <select id="customYAxis"></select>
+          <button class="btn small" onclick="renderCustomChart()">그래프 그리기</button>
+        </div>
+        <canvas id="chart-custom"></canvas>
+        <div id="customCorrResult"></div>
+      </div>
+
+      <div id="sensorCharts"></div>
+      <div id="sensorTableWrap" style="overflow-x:auto;"></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- 모달: 새 프로젝트 -->
+<div id="projectModalOverlay" class="overlay hidden">
+  <div class="modal">
+    <h2>🌱 새 프로젝트 만들기</h2>
+    <div class="field">
+      <label>프로젝트 이름</label>
+      <input type="text" id="pTitle" placeholder="예: 프로젝트 1 - 콩나물 빛 실험">
+    </div>
+    <div class="field">
+      <label>가설</label>
+      <textarea id="pHypo" placeholder="예: 빛을 많이 받을수록 콩나물이 더 빨리 자랄 것이다."></textarea>
+    </div>
+    <div class="field">
+      <label>조작변인 (내가 바꾸는 것)</label>
+      <input type="text" id="pIndep" placeholder="예: 빛을 받는 시간">
+    </div>
+    <div class="field">
+      <label>통제변인 (똑같이 유지할 것)</label>
+      <input type="text" id="pCtrl" placeholder="예: 물의 양, 온도, 씨앗 종류">
+    </div>
+    <div class="field">
+      <label>종속변인 (측정할 결과)</label>
+      <input type="text" id="pDep" placeholder="예: 콩나물의 길이(cm)">
+    </div>
+    <div class="modal-actions">
+      <button class="btn secondary block" onclick="closeProjectModal()">취소</button>
+      <button class="btn block" onclick="saveProject()">만들기</button>
+    </div>
+  </div>
+</div>
+
+<!-- 모달: 기록 추가 -->
+<div id="recordModalOverlay" class="overlay hidden">
+  <div class="modal">
+    <h2 id="recordModalTitle">🌿 관찰 기록 추가</h2>
+    <div class="field">
+      <label>이름</label>
+      <input type="text" id="rName" placeholder="홍길동">
+    </div>
+    <div class="field">
+      <label>관찰 날짜</label>
+      <input type="date" id="rDate">
+    </div>
+    <div class="field">
+      <label>사진 (선택)</label>
+      <div class="photo-input-wrap">
+        <input type="file" id="rPhoto" accept="image/*" onchange="previewPhoto(event)">
+        <img id="rPhotoPreview" class="photo-preview">
+      </div>
+    </div>
+    <div class="field">
+      <label>관찰 내용</label>
+      <textarea id="rContent" placeholder="오늘 관찰한 내용을 자세히 적어보세요. 길이, 색깔, 잎의 개수 등"></textarea>
+    </div>
+    <div class="field">
+      <label>비고 (선택)</label>
+      <textarea id="rNote" placeholder="특이사항이나 궁금한 점 등을 자유롭게 적어보세요"></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn secondary block" onclick="closeRecordModal()">취소</button>
+      <button class="btn block" id="rSaveBtn" onclick="saveRecord()">기록하기</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<!-- 모달: 센서 데이터 입력 -->
+<div id="sensorModalOverlay" class="overlay hidden">
+  <div class="modal">
+    <h2>📊 센서 데이터 입력</h2>
+    <div class="field">
+      <label>측정 날짜</label>
+      <input type="date" id="sDate">
+    </div>
+    <div id="sensorValueFields"></div>
+    <div class="field">
+      <label id="sGrowthLabel">식물 성장 측정값 (선택)</label>
+      <input type="text" id="sGrowth" placeholder="예: 3.2">
+      <div class="hint">숫자만 입력하면 성장 그래프/상관관계 분석에 쓰여요</div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn secondary block" onclick="closeSensorModal()">취소</button>
+      <button class="btn block" onclick="saveSensorEntry()">저장</button>
+    </div>
+  </div>
+</div>
+
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+
+<script>
+/* =======================================================
+   🔧 여기에 본인의 Firebase 설정값을 붙여넣으세요!
+   Firebase 콘솔 > 프로젝트 설정 > 일반 > 내 앱 > SDK 설정에서 확인
+   ======================================================= */
+const firebaseConfig = {
+  apiKey: "AIzaSyCQwpk19h2W62fSJ2-cn5IwBRElRpL41lU",
+  authDomain: "stem-e8f72.firebaseapp.com",
+  databaseURL: "https://stem-e8f72-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "stem-e8f72",
+  messagingSenderId: "798483171621",
+  appId: "1:798483171621:web:d65de8447f98ca68e832cc"
+};
+/* ======================================================= */
+/* 참고: 사진은 Firebase Storage 대신 브라우저에서 압축해 Realtime
+   Database에 직접 저장해요 (Storage는 유료 Blaze 요금제가 필요해서
+   카드 등록 없이 쓸 수 있도록 이렇게 설계했어요). */
+
+let db;
+let isConfigured = firebaseConfig.apiKey !== "YOUR_API_KEY";
+
+if (isConfigured) {
+  firebase.initializeApp(firebaseConfig);
+  db = firebase.database();
+} else {
+  document.getElementById('configWarning').classList.remove('hidden');
+}
+
+let currentProjectId = null;
+let projectsCache = {};
+let pendingPhotoFile = null;
+let editingRecordId = null;
+let existingPhotoURL = null;
+let currentTab = 'records';
+let chartInstances = {};
+
+function toast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(()=> t.classList.remove('show'), 2200);
+}
+
+/* ---------- 홈 화면: 프로젝트 목록 ---------- */
+function loadProjects(){
+  if(!isConfigured) return;
+  db.ref('projects').on('value', snap => {
+    projectsCache = snap.val() || {};
+    renderProjectGrid();
+    if(currentProjectId && !document.getElementById('view-detail').classList.contains('hidden')){
+      renderDetail();
+    }
+  });
+}
+
+function renderProjectGrid(){
+  const grid = document.getElementById('projectGrid');
+  const empty = document.getElementById('emptyProjects');
+  const ids = Object.keys(projectsCache).sort((a,b)=> (projectsCache[a].createdAt||0) - (projectsCache[b].createdAt||0));
+  grid.innerHTML = '';
+  if(ids.length === 0){
+    empty.classList.remove('hidden');
+    return;
+  }
+  empty.classList.add('hidden');
+  ids.forEach((id, idx) => {
+    const p = projectsCache[id];
+    const records = p.records || {};
+    const recordCount = Object.keys(records).length;
+    const lastPhoto = Object.values(records).reverse().find(r => r.photoURL);
+    const card = document.createElement('div');
+    card.className = 'project-card';
+    card.onclick = () => openDetail(id);
+    card.innerHTML = `
+      <span class="num">#${idx+1}</span>
+      ${lastPhoto ? `<img class="thumb" src="${lastPhoto.photoURL}">` : ''}
+      <h3>${escapeHtml(p.title || '제목 없음')}</h3>
+      <div class="hypo">${escapeHtml(p.hypothesis || '')}</div>
+      <div class="meta"><span>🌿 기록 ${recordCount}개</span></div>
+    `;
+    grid.appendChild(card);
+  });
+}
+
+function goHome(){
+  document.getElementById('view-detail').classList.add('hidden');
+  document.getElementById('view-home').classList.remove('hidden');
+  currentProjectId = null;
+}
+
+/* ---------- 프로젝트 상세 ---------- */
+function openDetail(id){
+  currentProjectId = id;
+  document.getElementById('view-home').classList.add('hidden');
+  document.getElementById('view-detail').classList.remove('hidden');
+  switchTab('records');
+  renderDetail();
+}
+
+function switchTab(tab){
+  currentTab = tab;
+  document.getElementById('tab-records').classList.toggle('hidden', tab !== 'records');
+  document.getElementById('tab-sensor').classList.toggle('hidden', tab !== 'sensor');
+  document.getElementById('tabBtnRecords').classList.toggle('active', tab === 'records');
+  document.getElementById('tabBtnSensor').classList.toggle('active', tab === 'sensor');
+  if(tab === 'sensor'){
+    renderSensorTab();
+  }
+}
+
+function renderDetail(){
+  const p = projectsCache[currentProjectId];
+  if(!p) return;
+  document.getElementById('detailTitle').textContent = p.title || '';
+  document.getElementById('detailHypo').textContent = p.hypothesis || '(가설이 입력되지 않았어요)';
+  document.getElementById('detailIndep').textContent = p.independentVar || '-';
+  document.getElementById('detailCtrl').textContent = p.controlledVar || '-';
+  document.getElementById('detailDep').textContent = p.dependentVar || '-';
+
+  const records = p.records || {};
+  const ids = Object.keys(records).sort((a,b)=> (records[a].createdAt||0) - (records[b].createdAt||0));
+  const timeline = document.getElementById('timeline');
+  const empty = document.getElementById('emptyRecords');
+  timeline.innerHTML = '';
+  if(ids.length === 0){
+    empty.classList.remove('hidden');
+  } else {
+    empty.classList.add('hidden');
+    ids.forEach(rid => {
+      const r = records[rid];
+      const div = document.createElement('div');
+      div.className = 'record';
+      div.innerHTML = `
+        <div class="record-card">
+          <div class="rec-head">
+            <span class="rec-who">${escapeHtml(r.studentName||'')}</span>
+            <span class="rec-date">${escapeHtml(r.date||'')}</span>
+          </div>
+          <div class="rec-content">${escapeHtml(r.content||'')}</div>
+          ${r.note ? `<div class="rec-note"><span class="rec-note-label">비고</span>${escapeHtml(r.note)}</div>` : ''}
+          ${r.photoURL ? `<img src="${r.photoURL}">` : ''}
+          <div class="rec-actions">
+            <button class="btn secondary small" onclick="openRecordModal('${rid}')">수정</button>
+            <button class="btn danger small" onclick="deleteRecord('${rid}')">삭제</button>
+          </div>
+        </div>
+      `;
+      timeline.appendChild(div);
+    });
+  }
+
+  if(currentTab === 'sensor'){
+    renderSensorTab();
+  }
+}
+
+/* ---------- 새 프로젝트 모달 ---------- */
+function openProjectModal(){
+  ['pTitle','pHypo','pIndep','pCtrl','pDep'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('projectModalOverlay').classList.remove('hidden');
+}
+function closeProjectModal(){
+  document.getElementById('projectModalOverlay').classList.add('hidden');
+}
+function saveProject(){
+  if(!isConfigured){ toast('먼저 Firebase 설정을 완료해주세요'); return; }
+  const title = document.getElementById('pTitle').value.trim();
+  if(!title){ toast('프로젝트 이름을 입력해주세요'); return; }
+  const newRef = db.ref('projects').push();
+  newRef.set({
+    title,
+    hypothesis: document.getElementById('pHypo').value.trim(),
+    independentVar: document.getElementById('pIndep').value.trim(),
+    controlledVar: document.getElementById('pCtrl').value.trim(),
+    dependentVar: document.getElementById('pDep').value.trim(),
+    createdAt: Date.now()
+  }).then(() => {
+    closeProjectModal();
+    toast('프로젝트를 만들었어요 🌱');
+  });
+}
+
+function deleteProject(){
+  if(!confirm('이 프로젝트와 모든 기록을 삭제할까요? 되돌릴 수 없어요.')) return;
+  db.ref('projects/'+currentProjectId).remove().then(() => {
+    toast('프로젝트를 삭제했어요');
+    goHome();
+  });
+}
+
+/* ---------- 기록 추가/수정 모달 ---------- */
+function openRecordModal(rid){
+  editingRecordId = rid || null;
+  const existing = rid ? (projectsCache[currentProjectId].records || {})[rid] : null;
+
+  document.getElementById('recordModalTitle').textContent = existing ? '🌿 관찰 기록 수정' : '🌿 관찰 기록 추가';
+  document.getElementById('rSaveBtn').textContent = existing ? '수정하기' : '기록하기';
+
+  document.getElementById('rName').value = existing ? existing.studentName || '' : (localStorage.getItem('plantArchive_name') || '');
+  document.getElementById('rDate').value = existing ? existing.date || '' : new Date().toISOString().slice(0,10);
+  document.getElementById('rContent').value = existing ? existing.content || '' : '';
+  document.getElementById('rNote').value = existing ? existing.note || '' : '';
+  document.getElementById('rPhoto').value = '';
+  pendingPhotoFile = null;
+  existingPhotoURL = existing ? (existing.photoURL || null) : null;
+
+  const preview = document.getElementById('rPhotoPreview');
+  if(existingPhotoURL){
+    preview.src = existingPhotoURL;
+    preview.style.display = 'block';
+  } else {
+    preview.style.display = 'none';
+  }
+
+  document.getElementById('recordModalOverlay').classList.remove('hidden');
+}
+function closeRecordModal(){
+  document.getElementById('recordModalOverlay').classList.add('hidden');
+}
+function compressImage(file, maxDim, quality){
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        let { width, height } = img;
+        if(width > height && width > maxDim){
+          height = Math.round(height * (maxDim / width));
+          width = maxDim;
+        } else if(height > maxDim){
+          width = Math.round(width * (maxDim / height));
+          height = maxDim;
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = width; canvas.height = height;
+        canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+        resolve(canvas.toDataURL('image/jpeg', quality));
+      };
+      img.onerror = reject;
+      img.src = e.target.result;
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+function previewPhoto(e){
+  const file = e.target.files[0];
+  if(!file) return;
+  pendingPhotoFile = file;
+  const preview = document.getElementById('rPhotoPreview');
+  preview.src = URL.createObjectURL(file);
+  preview.style.display = 'block';
+}
+
+function saveRecord(){
+  if(!isConfigured){ toast('먼저 Firebase 설정을 완료해주세요'); return; }
+  const name = document.getElementById('rName').value.trim();
+  const date = document.getElementById('rDate').value;
+  const content = document.getElementById('rContent').value.trim();
+  const note = document.getElementById('rNote').value.trim();
+  if(!name){ toast('이름을 입력해주세요'); return; }
+  if(!content){ toast('관찰 내용을 입력해주세요'); return; }
+
+  localStorage.setItem('plantArchive_name', name);
+
+  const saveBtn = document.getElementById('rSaveBtn');
+  const isEditing = !!editingRecordId;
+  saveBtn.textContent = '저장 중...';
+  saveBtn.disabled = true;
+
+  const recRef = isEditing
+    ? db.ref('projects/'+currentProjectId+'/records/'+editingRecordId)
+    : db.ref('projects/'+currentProjectId+'/records').push();
+
+  function finishSave(photoURL){
+    const data = {
+      studentName: name,
+      date,
+      content,
+      note: note || null,
+      photoURL: photoURL || null
+    };
+    const op = isEditing ? recRef.update(data) : recRef.set({ ...data, createdAt: Date.now() });
+    op.then(() => {
+      closeRecordModal();
+      toast(isEditing ? '기록을 수정했어요 🌿' : '기록을 저장했어요 🌿');
+      saveBtn.textContent = isEditing ? '수정하기' : '기록하기';
+      saveBtn.disabled = false;
+    });
+  }
+
+  if(pendingPhotoFile){
+    compressImage(pendingPhotoFile, 900, 0.6).then(dataUrl => {
+      finishSave(dataUrl);
+    }).catch(err => {
+      console.error(err);
+      toast('사진 처리에 실패했어요. 사진 없이 저장할게요');
+      finishSave(existingPhotoURL);
+    });
+  } else {
+    finishSave(existingPhotoURL);
+  }
+}
+
+function deleteRecord(rid){
+  if(!confirm('이 기록을 삭제할까요?')) return;
+  db.ref('projects/'+currentProjectId+'/records/'+rid).remove().then(() => {
+    toast('기록을 삭제했어요');
+  });
+}
+
+/* ================= 센서 데이터 ================= */
+
+function getSensorFields(){
+  const p = projectsCache[currentProjectId];
+  return (p && p.sensorFields) ? p.sensorFields : [];
+}
+function getSensorData(){
+  const p = projectsCache[currentProjectId];
+  return (p && p.sensorData) ? p.sensorData : {};
+}
+
+function addSensorField(){
+  const input = document.getElementById('newFieldName');
+  const name = input.value.trim();
+  if(!name){ toast('센서 이름을 입력해주세요'); return; }
+  const fields = getSensorFields();
+  if(fields.includes(name)){ toast('이미 있는 센서예요'); return; }
+  const newFields = [...fields, name];
+  db.ref('projects/'+currentProjectId+'/sensorFields').set(newFields).then(() => {
+    input.value = '';
+    toast('센서를 추가했어요');
+  });
+}
+
+function removeSensorField(name){
+  if(!confirm(`"${name}" 센서를 목록에서 제거할까요? 이미 입력된 데이터 값은 남아있어요.`)) return;
+  const newFields = getSensorFields().filter(f => f !== name);
+  db.ref('projects/'+currentProjectId+'/sensorFields').set(newFields);
+}
+
+function renderSensorFieldChips(){
+  const wrap = document.getElementById('sensorFieldChips');
+  const fields = getSensorFields();
+  if(fields.length === 0){
+    wrap.innerHTML = `<span style="font-size:14px; color:var(--ink-soft);">아직 등록된 센서가 없어요</span>`;
+    return;
+  }
+  wrap.innerHTML = fields.map(f => `
+    <span class="field-chip">${escapeHtml(f)}<button onclick="removeSensorField('${escapeHtml(f).replace(/'/g,"\\'")}')">✕</button></span>
+  `).join('');
+}
+
+/* ---- 데이터 입력 모달 ---- */
+function openSensorModal(){
+  const fields = getSensorFields();
+  if(fields.length === 0){
+    toast('먼저 센서 이름을 하나 이상 추가해주세요');
+    return;
+  }
+  document.getElementById('sDate').value = new Date().toISOString().slice(0,10);
+  const p = projectsCache[currentProjectId];
+  document.getElementById('sGrowthLabel').textContent = '식물 성장 측정값 (선택)' + (p && p.dependentVar ? ` — ${p.dependentVar}` : '');
+  document.getElementById('sGrowth').value = '';
+  const container = document.getElementById('sensorValueFields');
+  container.innerHTML = fields.map(f => `
+    <div class="field">
+      <label>${escapeHtml(f)}</label>
+      <input type="text" class="sensor-value-input" data-field="${escapeHtml(f)}" placeholder="숫자로 입력">
+    </div>
+  `).join('');
+  document.getElementById('sensorModalOverlay').classList.remove('hidden');
+}
+function closeSensorModal(){
+  document.getElementById('sensorModalOverlay').classList.add('hidden');
+}
+
+function saveSensorEntry(){
+  if(!isConfigured){ toast('먼저 Firebase 설정을 완료해주세요'); return; }
+  const date = document.getElementById('sDate').value;
+  if(!date){ toast('날짜를 입력해주세요'); return; }
+  const values = {};
+  let hasValue = false;
+  document.querySelectorAll('.sensor-value-input').forEach(inp => {
+    const v = inp.value.trim();
+    if(v !== '' && !isNaN(parseFloat(v))){
+      values[inp.dataset.field] = parseFloat(v);
+      hasValue = true;
+    }
+  });
+  const growthRaw = document.getElementById('sGrowth').value.trim();
+  const growthValue = (growthRaw !== '' && !isNaN(parseFloat(growthRaw))) ? parseFloat(growthRaw) : null;
+
+  if(!hasValue && growthValue === null){
+    toast('값을 하나 이상 입력해주세요');
+    return;
+  }
+
+  const ref = db.ref('projects/'+currentProjectId+'/sensorData').push();
+  ref.set({ date, values, growthValue, createdAt: Date.now() }).then(() => {
+    closeSensorModal();
+    toast('센서 데이터를 저장했어요 📊');
+  });
+}
+
+function deleteSensorEntry(id){
+  if(!confirm('이 데이터를 삭제할까요?')) return;
+  db.ref('projects/'+currentProjectId+'/sensorData/'+id).remove().then(() => {
+    toast('삭제했어요');
+  });
+}
+
+/* ---- CSV 업로드 ---- */
+function parseCsv(text){
+  const lines = text.split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 0);
+  if(lines.length < 2) return [];
+  const headers = lines[0].split(',').map(h => h.trim());
+  const rows = [];
+  for(let i=1;i<lines.length;i++){
+    const cells = lines[i].split(',').map(c => c.trim());
+    const row = {};
+    headers.forEach((h, idx) => { row[h] = cells[idx] !== undefined ? cells[idx] : ''; });
+    rows.push(row);
+  }
+  return rows;
+}
+
+function handleCsvUpload(e){
+  const file = e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    const rows = parseCsv(ev.target.result);
+    if(rows.length === 0){ toast('CSV에서 데이터를 찾지 못했어요'); e.target.value=''; return; }
+
+    const headers = Object.keys(rows[0]);
+    const dateKey = headers.find(h => /^(날짜|date)$/i.test(h));
+    if(!dateKey){ toast('CSV 첫 번째 열은 "날짜"여야 해요'); e.target.value=''; return; }
+    const growthKey = headers.find(h => /^(성장|growth)$/i.test(h));
+    const sensorKeys = headers.filter(h => h !== dateKey && h !== growthKey);
+
+    const existingFields = getSensorFields();
+    const newFields = [...new Set([...existingFields, ...sensorKeys])];
+
+    const updates = {};
+    let count = 0;
+    rows.forEach(row => {
+      const date = row[dateKey];
+      if(!date) return;
+      const values = {};
+      sensorKeys.forEach(k => {
+        const v = parseFloat(row[k]);
+        if(!isNaN(v)) values[k] = v;
+      });
+      const growthValue = growthKey && !isNaN(parseFloat(row[growthKey])) ? parseFloat(row[growthKey]) : null;
+      const id = db.ref('projects/'+currentProjectId+'/sensorData').push().key;
+      updates[id] = { date, values, growthValue, createdAt: Date.now() };
+      count++;
+    });
+
+    Promise.all([
+      db.ref('projects/'+currentProjectId+'/sensorFields').set(newFields),
+      db.ref('projects/'+currentProjectId+'/sensorData').update(updates)
+    ]).then(() => {
+      toast(`${count}개 데이터를 CSV로 불러왔어요 📄`);
+    });
+    e.target.value = '';
+  };
+  reader.readAsText(file, 'UTF-8');
+}
+
+/* ---- 통계: 피어슨 상관계수 ---- */
+function pearson(xs, ys){
+  const n = xs.length;
+  if(n < 3) return null;
+  const mx = xs.reduce((a,b)=>a+b,0)/n;
+  const my = ys.reduce((a,b)=>a+b,0)/n;
+  let num=0, dx2=0, dy2=0;
+  for(let i=0;i<n;i++){
+    const dx = xs[i]-mx, dy = ys[i]-my;
+    num += dx*dy; dx2 += dx*dx; dy2 += dy*dy;
+  }
+  const denom = Math.sqrt(dx2*dy2);
+  if(denom === 0) return null;
+  return num/denom;
+}
+function interpretR(r){
+  const ar = Math.abs(r);
+  const strength = ar >= 0.7 ? '강한' : ar >= 0.4 ? '뚜렷한' : ar >= 0.2 ? '약한' : '거의 없는';
+  const cls = ar >= 0.7 ? 'strong' : ar >= 0.4 ? 'mid' : 'weak';
+  const direction = ar < 0.2 ? '' : (r > 0 ? '양의 ' : '음의 ');
+  return { text: `${strength} ${direction}상관관계 (r = ${r.toFixed(2)})`, cls };
+}
+
+/* ---- 커스텀 축 선택 그래프 ---- */
+function getAxisLabel(key){
+  if(key === '__date__') return '날짜';
+  if(key === '__growth__') return '성장';
+  return key;
+}
+function getAxisValue(entry, key){
+  if(key === '__date__') return entry.date || null;
+  if(key === '__growth__') return (entry.growthValue !== undefined && entry.growthValue !== null) ? entry.growthValue : null;
+  return (entry.values && entry.values[key] !== undefined) ? entry.values[key] : null;
+}
+
+function populateCustomAxisSelectors(fields, hasGrowth){
+  const xSel = document.getElementById('customXAxis');
+  const ySel = document.getElementById('customYAxis');
+  const prevX = xSel.value, prevY = ySel.value;
+  const options = [{ v:'__date__', l:'날짜' }, ...fields.map(f => ({ v:f, l:f }))];
+  if(hasGrowth) options.push({ v:'__growth__', l:'성장' });
+  const optHtml = options.map(o => `<option value="${escapeHtml(o.v)}">${escapeHtml(o.l)}</option>`).join('');
+  xSel.innerHTML = optHtml;
+  ySel.innerHTML = optHtml;
+  const values = options.map(o => o.v);
+  xSel.value = values.includes(prevX) ? prevX : '__date__';
+  const defaultY = fields[0] || (hasGrowth ? '__growth__' : '__date__');
+  ySel.value = values.includes(prevY) ? prevY : defaultY;
+}
+
+function renderCustomChart(){
+  const xKey = document.getElementById('customXAxis').value;
+  const yKey = document.getElementById('customYAxis').value;
+  const resultEl = document.getElementById('customCorrResult');
+  resultEl.innerHTML = '';
+
+  if(chartInstances['chart-custom']){
+    chartInstances['chart-custom'].destroy();
+    delete chartInstances['chart-custom'];
+  }
+
+  if(!xKey || !yKey || xKey === yKey){
+    resultEl.innerHTML = `<span style="font-size:13px; color:var(--ink-soft);">X축과 Y축을 다르게 선택해주세요</span>`;
+    return;
+  }
+
+  const data = getSensorData();
+  const ids = Object.keys(data).sort((a,b) => (data[a].date||'').localeCompare(data[b].date||''));
+  const ctx = document.getElementById('chart-custom').getContext('2d');
+
+  if(xKey === '__date__' || yKey === '__date__'){
+    const valueKey = xKey === '__date__' ? yKey : xKey;
+    const dates = ids.map(id => data[id].date);
+    const values = ids.map(id => getAxisValue(data[id], valueKey));
+    chartInstances['chart-custom'] = new Chart(ctx, {
+      type:'line',
+      data:{ labels:dates, datasets:[{ label:getAxisLabel(valueKey), data:values, borderColor:'#4A7856', backgroundColor:'#4A785633', tension:0.3, spanGaps:true }] },
+      options:{ responsive:true, plugins:{ legend:{ display:false } },
+        scales:{ x:{ title:{ display:true, text:'날짜' } }, y:{ title:{ display:true, text:getAxisLabel(valueKey) }, beginAtZero:false } } }
+    });
+  } else {
+    const pairs = ids.map(id => data[id])
+      .map(d => ({ x:getAxisValue(d,xKey), y:getAxisValue(d,yKey) }))
+      .filter(p => p.x !== null && p.y !== null);
+    chartInstances['chart-custom'] = new Chart(ctx, {
+      type:'scatter',
+      data:{ datasets:[{ label:`${getAxisLabel(xKey)} vs ${getAxisLabel(yKey)}`, data:pairs, backgroundColor:'#4A7856' }] },
+      options:{ responsive:true, plugins:{ legend:{ display:false } },
+        scales:{ x:{ title:{ display:true, text:getAxisLabel(xKey) } }, y:{ title:{ display:true, text:getAxisLabel(yKey) } } } }
+    });
+    if(pairs.length >= 3){
+      const r = pearson(pairs.map(p=>p.x), pairs.map(p=>p.y));
+      if(r !== null){
+        const { text, cls } = interpretR(r);
+        resultEl.innerHTML = `<span class="corr-badge ${cls}">${text}</span>`;
+      }
+    } else {
+      resultEl.innerHTML = `<span style="font-size:13px; color:var(--ink-soft);">상관계수 계산에는 데이터가 3개 이상 필요해요</span>`;
+    }
+  }
+}
+
+/* ---- 렌더링 ---- */
+function renderSensorTab(){
+  renderSensorFieldChips();
+  const fields = getSensorFields();
+  const data = getSensorData();
+  const ids = Object.keys(data).sort((a,b) => (data[a].date||'').localeCompare(data[b].date||''));
+
+  const emptyEl = document.getElementById('sensorEmpty');
+  const chartsEl = document.getElementById('sensorCharts');
+  const tableWrap = document.getElementById('sensorTableWrap');
+
+  // 기존 차트 정리
+  Object.values(chartInstances).forEach(c => c.destroy());
+  chartInstances = {};
+  chartsEl.innerHTML = '';
+  tableWrap.innerHTML = '';
+
+  if(ids.length === 0){
+    emptyEl.classList.remove('hidden');
+    document.getElementById('customChartCard').classList.add('hidden');
+    return;
+  }
+  emptyEl.classList.add('hidden');
+
+  const dates = ids.map(id => data[id].date);
+  const hasGrowth = ids.some(id => data[id].growthValue !== null && data[id].growthValue !== undefined);
+
+  populateCustomAxisSelectors(fields, hasGrowth);
+  document.getElementById('customChartCard').classList.remove('hidden');
+  renderCustomChart();
+
+  // 1) 센서별 시간 추이 그래프
+  fields.forEach((field, idx) => {
+    const values = ids.map(id => (data[id].values && data[id].values[field] !== undefined) ? data[id].values[field] : null);
+    if(values.every(v => v === null)) return;
+    const card = document.createElement('div');
+    card.className = 'chart-card';
+    const canvasId = 'chart-field-'+idx;
+    card.innerHTML = `<h4>📈 ${escapeHtml(field)} 변화 추이</h4><canvas id="${canvasId}"></canvas>`;
+    chartsEl.appendChild(card);
+    chartInstances[canvasId] = new Chart(document.getElementById(canvasId).getContext('2d'), {
+      type: 'line',
+      data: { labels: dates, datasets: [{ label: field, data: values, borderColor: '#4A7856', backgroundColor:'#4A785633', tension:0.3, spanGaps:true }] },
+      options: { responsive:true, plugins:{ legend:{ display:false } }, scales:{ y:{ beginAtZero:false } } }
+    });
+  });
+
+  // 2) 성장 추이 그래프
+  if(hasGrowth){
+    const growthValues = ids.map(id => data[id].growthValue !== undefined ? data[id].growthValue : null);
+    const card = document.createElement('div');
+    card.className = 'chart-card';
+    card.innerHTML = `<h4>🌱 식물 성장 추이</h4><canvas id="chart-growth"></canvas>`;
+    chartsEl.appendChild(card);
+    chartInstances['chart-growth'] = new Chart(document.getElementById('chart-growth').getContext('2d'), {
+      type: 'line',
+      data: { labels: dates, datasets: [{ label:'성장', data: growthValues, borderColor:'#E8927C', backgroundColor:'#E8927C33', tension:0.3, spanGaps:true }] },
+      options: { responsive:true, plugins:{ legend:{ display:false } }, scales:{ y:{ beginAtZero:false } } }
+    });
+  }
+
+  // 3) 센서 vs 성장 상관관계 (산점도 + 피어슨 r)
+  if(hasGrowth){
+    fields.forEach((field, idx) => {
+      const pairs = ids
+        .map(id => data[id])
+        .filter(d => d.values && d.values[field] !== undefined && d.growthValue !== null && d.growthValue !== undefined);
+      if(pairs.length < 3) return;
+      const xs = pairs.map(d => d.values[field]);
+      const ys = pairs.map(d => d.growthValue);
+      const r = pearson(xs, ys);
+      if(r === null) return;
+      const { text, cls } = interpretR(r);
+
+      const card = document.createElement('div');
+      card.className = 'chart-card';
+      const canvasId = 'chart-corr-'+idx;
+      card.innerHTML = `<h4>🔍 ${escapeHtml(field)} — 식물 성장 상관관계</h4><canvas id="${canvasId}"></canvas><span class="corr-badge ${cls}">${text}</span>`;
+      chartsEl.appendChild(card);
+      chartInstances[canvasId] = new Chart(document.getElementById(canvasId).getContext('2d'), {
+        type: 'scatter',
+        data: { datasets: [{ label: `${field} vs 성장`, data: xs.map((x,i)=>({x, y:ys[i]})), backgroundColor:'#4A7856' }] },
+        options: {
+          responsive:true,
+          plugins:{ legend:{ display:false } },
+          scales:{ x:{ title:{ display:true, text:field } }, y:{ title:{ display:true, text:'성장' } } }
+        }
+      });
+    });
+  }
+
+  // 4) 데이터 표
+  const table = document.createElement('table');
+  table.className = 'sensor-table';
+  const growthHeader = hasGrowth ? '<th>성장</th>' : '';
+  table.innerHTML = `
+    <thead><tr><th>날짜</th>${fields.map(f=>`<th>${escapeHtml(f)}</th>`).join('')}${growthHeader}<th></th></tr></thead>
+    <tbody>
+      ${ids.map(id => {
+        const d = data[id];
+        const cells = fields.map(f => `<td class="num">${d.values && d.values[f] !== undefined ? d.values[f] : '-'}</td>`).join('');
+        const growthCell = hasGrowth ? `<td class="num">${d.growthValue !== null && d.growthValue !== undefined ? d.growthValue : '-'}</td>` : '';
+        return `<tr><td>${escapeHtml(d.date||'')}</td>${cells}${growthCell}<td class="del-cell"><button onclick="deleteSensorEntry('${id}')">✕</button></td></tr>`;
+      }).join('')}
+    </tbody>
+  `;
+  tableWrap.appendChild(table);
+}
+
+function escapeHtml(str){
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+loadProjects();
+</script>
+</body>
+</html>
